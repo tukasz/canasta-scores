@@ -1,5 +1,5 @@
-main.svelte-1p1su8b{padding:0.5rem}
-.row.svelte-4saff5{margin-bottom:0.5rem}
-.header.svelte-q7kad4{background-color:cadetblue;color:white;padding:0.5rem}
+.form.svelte-9p5n1o{padding:1rem;margin-bottom:4rem}.row.svelte-9p5n1o{margin-bottom:0.75rem}.two-columns.svelte-9p5n1o{display:grid;grid-template-columns:1fr 1fr;grid-column-gap:2rem}.field-label.svelte-9p5n1o{font-size:0.75rem;margin-bottom:0.25rem}.footer.svelte-9p5n1o{position:fixed;bottom:0.25rem;left:0.25rem;right:0.25rem;display:flex;align-items:center;justify-content:space-between}.score-value.svelte-9p5n1o{font-weight:bold}.separator.svelte-9p5n1o{width:50%;margin:auto;border-top:1px solid #c6c8ca;margin-bottom:0.5rem;margin-top:0.5rem}
+.number-picker.svelte-v7ytgn{display:flex;align-items:center;background-color:#d6d8d9;border-radius:0.25rem;padding:0.25rem}.decrement.svelte-v7ytgn,.value.svelte-v7ytgn,.increment.svelte-v7ytgn{flex:1}.value.svelte-v7ytgn{font-size:1.2rem;display:flex;place-content:center}
+.toggle-buttons.svelte-1dy2ujm{display:flex;width:100%}.button.svelte-1dy2ujm{flex:1 auto;margin-right:0.25rem}.button.svelte-1dy2ujm:last-child{margin-right:0}
 
 /*# sourceMappingURL=bundle.css.map */

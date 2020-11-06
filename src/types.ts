@@ -1,13 +1,4 @@
-export enum CalculatorFormFieldType {
-  NUMBER = 'NUMBER',
-  CHECKBOX = 'CHECKBOX',
-}
-
-export interface CalculatorFormField {
-  type: CalculatorFormFieldType;
+export interface LabelValue {
   label: string;
-  description?: string;
-  value?: any;
-  points: number;
-  isSpecial?: boolean;
+  value: string | boolean | number;
 }
