@@ -36,4 +36,18 @@
   .button:last-child {
     margin-right: 0;
   }
+
+  @media (max-width: 400px) {
+    .toggle-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 0.25rem;
+      width: 100%;
+    }
+
+    .button {
+      flex: unset;
+      margin-right: 0;
+    }
+  }
 </style>
