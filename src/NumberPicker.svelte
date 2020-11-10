@@ -1,7 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
 
-  export let min = 0;
   export let max = 99;
   export let value = null;
 
@@ -12,7 +11,7 @@
       dispatch('change', 0);
     }
 
-    if (value > min) {
+    if (value > 0) {
       dispatch('change', value - 1);
     }
   }
@@ -22,7 +21,7 @@
       dispatch('change', 0);
     }
 
-    if (value < max) {
+    if (max === null || typeof max === 'undefined' || value < max) {
       dispatch('change', value + 1);
     }
   }

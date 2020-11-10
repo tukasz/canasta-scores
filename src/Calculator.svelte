@@ -1,142 +1,13 @@
 <script lang="ts">
   import ToggleButtons from './ToggleButtons.svelte';
   import NumberPicker from './NumberPicker.svelte';
+  import TooltipIcon from './TooltipIcon.svelte';
+  import type { CountableField } from './config';
+  import { CardsOnTable, SpecialFieldType, cardsOnTableooltipHtml, footerTooltipHtml, countableFieldGroups, meldsStyleButtons } from './config';
 
-  const meldsStyleButtons = [
-    {
-      label: 'Żadne',
-      value: 'no',
-    },
-    {
-      label: 'Część',
-      value: 'some',
-    },
-    {
-      label: 'Wszystkie',
-      value: 'all',
-    },
-    {
-      label: 'Wszystkie od razu',
-      value: 'all-at-once',
-    },
-  ];
+  let fieldGroups = [...countableFieldGroups]
 
   let meldsStyle = null;
-
-  const countersMap = {
-    wildcardCanastas: {
-      count: 0,
-      score: 1000,
-    },
-    naturalCanastas: {
-      count: 0,
-      score: 500,
-    },
-    mixedCanastas: {
-      count: 0,
-      score: 300,
-    },
-    jokers: {
-      count: 0,
-      score: 50,
-    },
-    acesTwos: {
-      count: 0,
-      score: 20,
-    },
-    kingsToEights: {
-      count: 0,
-      score: 10,
-    },
-    sevensToThrees: {
-      count: 0,
-      score: 5,
-    },
-    jokersOnHand: {
-      count: 0,
-      score: -50,
-    },
-    acesTwosOnHand: {
-      count: 0,
-      score: -20,
-    },
-    kingsToEightsOnHand: {
-      count: 0,
-      score: -10,
-    },
-    sevensToThreesOnHand: {
-      count: 0,
-      score: -5,
-    },
-  };
-
-  const counterFields: Array<{
-    label: string;
-    countersMapField: keyof typeof countersMap;
-    group: number;
-  }> = [
-    {
-      label: 'Kanasty "podpórkowe"',
-      countersMapField: 'wildcardCanastas',
-      group: 1,
-    },
-    {
-      label: 'Kanasty naturalne',
-      countersMapField: 'naturalCanastas',
-      group: 1,
-    },
-    {
-      label: 'Kanasty mieszane',
-      countersMapField: 'mixedCanastas',
-      group: 1,
-    },
-    {
-      label: 'Jokery na stole',
-      countersMapField: 'jokers',
-      group: 2,
-    },
-    {
-      label: 'Asy i 2 na stole',
-      countersMapField: 'acesTwos',
-      group: 2,
-    },
-    {
-      label: 'K, Q, J, 10, 9, 8 na stole',
-      countersMapField: 'kingsToEights',
-      group: 2,
-    },
-    {
-      label: '7, 6, 5, 4, 3 na stole',
-      countersMapField: 'sevensToThrees',
-      group: 2,
-    },
-    {
-      label: 'Jokery na ręce',
-      countersMapField: 'jokersOnHand',
-      group: 3,
-    },
-    {
-      label: 'Asy i 2 na ręce',
-      countersMapField: 'acesTwosOnHand',
-      group: 3,
-    },
-    {
-      label: 'K, Q, J, 10, 9, 8 na ręce',
-      countersMapField: 'kingsToEightsOnHand',
-      group: 3,
-    },
-    {
-      label: '7, 6, 5, 4, 3 na ręce',
-      countersMapField: 'sevensToThreesOnHand',
-      group: 3,
-    },
-  ];
-
-  const meldCounters = counterFields.filter(fields => fields.group === 1);
-  const tableCardsCounters = counterFields.filter(fields => fields.group === 2);
-  const handCardsCounters = counterFields.filter(fields => fields.group === 3);
-
-  let red3sCount = 0;
 
   let score = 0;
 
@@ -145,35 +16,40 @@
 
     // Melds
     switch (meldsStyle) {
-      case 'all':
+      case CardsOnTable.ALL:
         score += 100;
 
         break;
 
-      case 'all-at-once':
+      case CardsOnTable.ALL_AT_ONCE:
         score += 200;
     }
 
-    // Standard numeric values
-    counterFields.forEach(field => {
-      score += countersMap[field.countersMapField].score * countersMap[field.countersMapField].count;
-    });
-
-    // Red threes
-    if (meldsStyle === 'all' || meldsStyle === 'all-at-once') {
-      score += red3sCount === 4 ? 800 : red3sCount * 100;
-    } else {
-      score -= red3sCount === 4 ? 800 : red3sCount * 100;
-    }
+    fieldGroups.forEach(group => {
+      group.fields.forEach(field => {
+        if (field.specialFieldType === SpecialFieldType.RED_THREE) {
+          // Red threes
+          if (meldsStyle === CardsOnTable.ALL || meldsStyle === CardsOnTable.ALL_AT_ONCE || meldsStyle === CardsOnTable.SOME) {
+            score += field.count === 4 ? 800 : field.count * 100;
+          } else {
+            score -= field.count === 4 ? 800 : field.count * 100;
+          }
+        } else {
+          // Standard numeric values
+          score += field.count * field.score
+        }
+      })
+    })
   }
 
   function resetScore() {
     meldsStyle = null;
-    red3sCount = 0;
 
-    counterFields.forEach(field => {
-      countersMap[field.countersMapField].count = 0;
-    });
+    fieldGroups.forEach(group => {
+      group.fields.forEach(field => {
+        field.count  = 0
+      })
+    })
 
     updateScore();
   }
@@ -181,23 +57,47 @@
   function updateMeldsStyle(event: CustomEvent<string | number | boolean>) {
     meldsStyle = event.detail;
 
-    if (meldsStyle === 'all' || meldsStyle === 'all-at-once') {
-      handCardsCounters.forEach(counter => {
-        countersMap[counter.countersMapField].count = 0;
-      });
+    if (meldsStyle === CardsOnTable.ALL || meldsStyle === CardsOnTable.ALL_AT_ONCE) {
+      fieldGroups.forEach(group => {
+        group.fields.forEach(field => {
+          if (field.score < 0) {
+            field.count  = 0
+          }
+        })
+      })
+    }
+
+    if (meldsStyle === CardsOnTable.NONE) {
+      fieldGroups.forEach(group => {
+        group.fields.forEach(field => {
+          if (field.score > 0 && field.specialFieldType !== SpecialFieldType.RED_THREE) {
+            field.count  = 0
+          }
+        })
+      })
     }
 
     updateScore();
   }
 
-  function updateCount(countName: keyof typeof countersMap, value: number) {
-    countersMap[countName].count = value;
+  function updateCount(field: CountableField, value: number) {
+    fieldGroups = fieldGroups.map(group => {
+      return {
+        ...group,
+        fields: group.fields.map(f => {
+          if (f === field) {
+            return {
+              ...f,
+              count: value
+            }
+          }
 
-    updateScore();
-  }
-
-  function updateRed3sCount(value: number) {
-    red3sCount = value;
+          return {
+            ...f
+          }
+        })
+      }
+    })
 
     updateScore();
   }
@@ -206,72 +106,46 @@
 <div class="calculator">
   <div class="form">
     <div class="row">
-      <div class="field-label">Wyłożono karty:</div>
+      <div class="field-label">Wyłożono karty: <TooltipIcon text={cardsOnTableooltipHtml} heading='Wyłożone karty' /></div>
 
       <ToggleButtons items={meldsStyleButtons} value={meldsStyle} on:change={updateMeldsStyle} />
     </div>
 
-    <div class="separator" />
+    {#each fieldGroups as group}
+      {#if group.fields.reduce((result, field) => {
+        return [
+          ...result,
+          ...field.visibleFor
+        ]
+      }, []).includes(meldsStyle)}
+        <div class="separator" />
 
-    <div class="two-columns">
-      {#each meldCounters as field}
-        <div class="row">
-          <div class="field-label">
-            {@html field.label}:
-          </div>
+        <div class="two-columns">
+          {#each group.fields as field}
+            {#if field.visibleFor.includes(meldsStyle)}
+              <div class="row">
+                <div class="field-label">
+                  {field.label} <TooltipIcon text={field.tooltipHtml} heading={field.label} />:
+                </div>
 
-          <NumberPicker
-            value={countersMap[field.countersMapField].count}
-            on:change={event => updateCount(field.countersMapField, event.detail)} />
+                <NumberPicker
+                  value={field.count}
+                  on:change={event => updateCount(field, event.detail)}
+                  max={field.maxCount} />
+              </div>
+            {/if}
+          {/each}
         </div>
-      {/each}
+      {/if}
+    {/each}
 
-      <div class="row">
-        <div class="field-label">Czerwone 3:</div>
+    <div class="footer panel panel-dark">
+      <div class="score">Wynik: <span class="score-value">{score}</span></div>
 
-        <NumberPicker max={4} value={red3sCount} on:change={event => updateRed3sCount(event.detail)} />
-      </div>
+      <TooltipIcon text={footerTooltipHtml} heading='Minimalna ilość punktów' size={24} />
+
+      <div class="reset-button"><button class="btn btn-primary" on:click={resetScore}>Wyczyść</button></div>
     </div>
-
-    <div class="separator" />
-
-    <div class="two-columns">
-      {#each tableCardsCounters as field}
-        <div class="row">
-          <div class="field-label">
-            {@html field.label}:
-          </div>
-
-          <NumberPicker
-            value={countersMap[field.countersMapField].count}
-            on:change={event => updateCount(field.countersMapField, event.detail)} />
-        </div>
-      {/each}
-    </div>
-
-    {#if meldsStyle === 'no' || meldsStyle === 'some'}
-      <div class="separator" />
-
-      <div class="two-columns">
-        {#each handCardsCounters as field}
-          <div class="row">
-            <div class="field-label">
-              {@html field.label}:
-            </div>
-
-            <NumberPicker
-              value={countersMap[field.countersMapField].count}
-              on:change={event => updateCount(field.countersMapField, event.detail)} />
-          </div>
-        {/each}
-      </div>
-    {/if}
-  </div>
-
-  <div class="footer panel panel-dark">
-    <div class="score">Wynik: <span class="score-value">{score}</span></div>
-
-    <div class="reset-button"><button class="btn btn-primary" on:click={resetScore}>Wyczyść</button></div>
   </div>
 </div>
 
@@ -293,7 +167,7 @@
 
   .field-label {
     font-size: 0.75rem;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.5rem;
   }
 
   .footer {
