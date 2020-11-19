@@ -1,6 +1,5 @@
 const cacheName = 'kanaskulator-cache-v1';
-
-const filesToCache = ['/', '/index.html'];
+const filesToCache = ['/'];
 
 self.addEventListener('install', e => {
   e.waitUntil(
