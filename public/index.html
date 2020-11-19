@@ -1,32 +1,41 @@
 <!DOCTYPE html>
-<html lang="pl_PL">
+<html lang="pl">
 
 <head>
-	<meta charset='utf-8'>
+	<meta charset='utf-8' />
 	<meta
 		name='viewport'
-		content='width=device-width,initial-scale=1'
-	>
+		content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no'
+	/>
+	<meta
+		name="theme-color"
+		content="#007bff"
+	/>
 
 	<title>Kanaskulator</title>
 
 	<link
-		rel='icon'
-		type='image/png'
-		href='/favicon.png'
-	>
+		rel="manifest"
+		href="/manifest.json"
+	/>
+	<link
+		rel="icon"
+		type="image/png"
+		sizes="32x32"
+		href="/favicon.png"
+	/>
 	<link
 		href="https://fonts.googleapis.com/css?family=Roboto&display=swap"
 		rel="stylesheet"
-	>
+	/>
 	<link
 		rel='stylesheet'
 		href='/global.css'
-	>
+	/>
 	<link
 		rel='stylesheet'
 		href='/build/bundle.css'
-	>
+	/>
 
 	<script
 		defer
@@ -35,6 +44,25 @@
 </head>
 
 <body>
+	<noscript>
+		<div>
+			Ojej! Ta aplikacja do działania wymaga aktywnej obsługi JavaScript'u!
+		</div>
+	</noscript>
+
+	<script>
+		if ('serviceWorker' in navigator) {
+			window.addEventListener('load', () => {
+				console.log('Trying to register Service Worker...');
+				navigator.serviceWorker.register('service-worker.js')
+					.then((reg) => {
+						console.log('Service Worker registered.', reg);
+					}, error => {
+						console.error('An error occured when registering a service worker', error)
+					})
+			});
+		}
+	</script>
 </body>
 
 </html>
