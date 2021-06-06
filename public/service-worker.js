@@ -1,4 +1,4 @@
-const cacheName = 'kanaskulator-cache-v1';
+const cacheName = 'kanaskulator-cache-v2';
 const filesToCache = ['/'];
 
 self.addEventListener('install', e => {
