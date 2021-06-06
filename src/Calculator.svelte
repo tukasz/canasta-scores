@@ -152,7 +152,7 @@
 <style>
   .form {
     padding: 1rem;
-    margin-bottom: 4rem;
+    padding-bottom: 4rem;
   }
 
   .row {
